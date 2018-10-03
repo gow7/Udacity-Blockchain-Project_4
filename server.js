@@ -5,6 +5,17 @@ const Joi = require('joi');
 const BC = require('./simpleChain');
 const validate = require('./validation');
 
+const starRegistrationSchema = {
+    address: Joi.string().trim().required(),
+    star: {
+        ra: Joi.string().trim().required(),
+        dec: Joi.string().trim().required(),
+        mag: Joi.string().trim(),
+        constellation: Joi.string().trim(),
+        story: Joi.string().trim().max(500, 'ascii')
+    }
+};
+
 const server = new Hapi.server({
     port: 8000,
     host: 'localhost'
@@ -18,10 +29,12 @@ server.route({
         <h3>Supported methods</h3>
         <b>POST</b> /requestValidation<br>
         <b>POST</b> /message-signature/validate<br>
+        <b>POST</b> /block<br>
+        <b>GET</b> /block/[height]<br>
         `;
     }
 });
-/*
+
 server.route({
     method: 'GET',
     path: '/block/{height}',
@@ -34,7 +47,12 @@ server.route({
     },
     handler: async (request, h) => {
         try {
-            return await BC.getBlock(request.params.height);
+            // location 0 is nto working need to check later.
+            const res = await BC.getBlock(request.params.height);
+            if (res.body.star.story !== undefined) {
+                res.body.star.story = Buffer.from(res.body.star.story, 'hex').toString('ascii');
+            }
+            return res;
         } catch (error) {
             if (error.type === 'NotFoundError') {
                 return h.response('Height Not Found').code(404);
@@ -48,20 +66,26 @@ server.route({
     path: '/block',
     options: {
         validate: {
-            payload: {
-                body: Joi.string().trim().required()
-            }
+            payload: Joi.object(starRegistrationSchema)
         }
     },
     handler: async (request, h) => {
         try {
-            return h.response(await BC.addBlock(request.payload.body.trim())).code(201);
+            const req = request.payload;
+            if (validate.registeredStar(req.address)) {
+                if (req.star.story !== undefined) {
+                    req.star.story = Buffer.from(req.star.story, 'ascii').toString('hex');
+                }
+                return h.response(await BC.addBlock(req)).code(201);
+            } else {
+                return h.response("You can reginter one start after validating the signature, please start requestValidation and validate the signature to add star").code(401);
+            }
         } catch (error) {
             return h.response(error.name + " " + error.message).code(500);
         }
     }
 });
-*/
+
 server.route({
     method: 'POST',
     path: '/requestValidation',

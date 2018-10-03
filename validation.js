@@ -2,6 +2,7 @@
 
 const bitcoinMessage = require('bitcoinjs-message');
 const activeAddresses = {};
+const validatedAddresses = {};
 
 const currentTimeStamp = function() {
     return new Date().getTime().toString().slice(0, -3);
@@ -29,8 +30,10 @@ const response = function(address) {
 }
 
 exports.newRequest = function (address) {
-    activeAddresses[address] = currentTimeStamp();
-    setTimeout(() => {delete activeAddresses[address]}, 300000);
+    if (activeAddresses[address] === undefined) {
+        activeAddresses[address] = currentTimeStamp();
+        setTimeout(() => {delete activeAddresses[address]}, 300000);
+    }
     return response(address);
 }
 
@@ -41,12 +44,28 @@ exports.sigValidate = function (address, signature) {
     const res = {registerStar: false, status: status};
     try {
         if (bitcoinMessage.verify(mess, address, signature)) {
+            validatedAddresses[address] = true;
             res.registerStar = true;
             res.status.messageSignature = "valid";
         }
     } catch (error) {
         res.status.messageSignature = error.message;
+
+        // Testing code below need to remove when submitting
+        /* validatedAddresses[address] = true;
+        res.registerStar = true;
+        res.status.messageSignature = "valid";
+        */
     }
     console.log(res);
+    return res;
+}
+
+exports.registeredStar = function (address) {
+    let res = false;
+    if (validatedAddresses[address] !== undefined && validatedAddresses[address]) {
+        res = true;
+        delete validatedAddresses[address];
+    }
     return res;
 }
