@@ -67,14 +67,14 @@ npm install bitcoinjs-message --save
 
 ## Testing
 
-To test code:
-1: Open a command prompt or shell terminal after install node.js.
+To test code:  
+1: Open a command prompt or shell terminal after install node.js.  
 2: Start node session with server.js.
 ```
 node server.js
 ```
-3: Start Postman
-4: Do a GET request to [http://localhost:8000/block/0] to get the genesis block details.
+3: Start Postman  
+4: Do a GET request to [http://localhost:8000/block/0] to get the genesis block details.  
 5: Do a POST request to [http://localhost:8000/requestValidation] with following. This will return a message to sign to validate the user.
 ```
 Sample Request
@@ -136,6 +136,6 @@ Sample Response
   "previousBlockHash": "49cce61ec3e6ae664514d5fa5722d86069cf981318fc303750ce66032d0acff3"
 }
 ```
-8: Do a GET request to [http://localhost:8000/block/{height}] replace the hight with the value returned from previour response and make sure returned value is same as previous one.
-9: Do a GET request to [http://localhost:8000/stars/hash:{hash}] replace the hash with the value returned from previour response and make sure returned value is same as previous one.
+8: Do a GET request to [http://localhost:8000/block/{height}] replace the hight with the value returned from previour response and make sure returned value is same as previous one.  
+9: Do a GET request to [http://localhost:8000/stars/hash:{hash}] replace the hash with the value returned from previour response and make sure returned value is same as previous one.  
 10: Do a GET request to [http://localhost:8000/stars/address:{address}] replace the address with your address and make sure returned all the stars registred with this address.
