@@ -21,6 +21,29 @@ const server = new Hapi.server({
     host: 'localhost'
 });
 
+async function find(keys, h) {
+    try {
+        const res = await BC.find(keys);
+        res.forEach(element => {
+            if (element.body.star.story !== undefined) {
+                element.body.star.story = Buffer.from(element.body.star.story, 'hex').toString('ascii');
+            }
+        });
+
+        if (res.length === 0) {
+            return h.response('Not Found').code(404);
+        } else {
+            return res;
+        }
+    } catch (error) {
+        if (error.type === 'NotFoundError') {  
+            return h.response('Not Found').code(404);
+        } else {
+            throw error;
+        }
+    }
+}
+
 server.route({
     method: '*',
     path: '/',
@@ -31,6 +54,8 @@ server.route({
         <b>POST</b> /message-signature/validate<br>
         <b>POST</b> /block<br>
         <b>GET</b> /block/[height]<br>
+        <b>GET</b> /block/stars/hash:[hash]<br>
+        <b>GET</b> /block/stars/address:[address]<br>
         `;
     }
 });
@@ -47,9 +72,8 @@ server.route({
     },
     handler: async (request, h) => {
         try {
-            // location 0 is nto working need to check later.
             const res = await BC.getBlock(request.params.height);
-            if (res.body.star.story !== undefined) {
+            if (res.body.star && res.body.star.story) {
                 res.body.star.story = Buffer.from(res.body.star.story, 'hex').toString('ascii');
             }
             return res;
@@ -58,6 +82,41 @@ server.route({
                 return h.response('Height Not Found').code(404);
             }
         }
+    }
+});
+
+server.route({
+    method: 'GET',
+    path: '/block/stars/hash:{hash}',
+    options: {
+        validate: {
+            params: {
+                hash: Joi.string().trim().required()
+            }
+        }
+    },
+    handler: (request, h) => {
+        const res = find(['hash', request.params.hash], h);
+        if (Array.isArray(res)) {
+            return res.pop();
+        } else {
+            return res;
+        }
+    }
+});
+
+server.route({
+    method: 'GET',
+    path: '/block/stars/address:{address}',
+    options: {
+        validate: {
+            params: {
+                address: Joi.string().trim().required()
+            }
+        }
+    },
+    handler: (request, h) => {
+        return find(['body', 'address', request.params.address], h);
     }
 });
 

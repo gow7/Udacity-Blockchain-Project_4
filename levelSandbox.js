@@ -2,20 +2,39 @@
 |  Learn more: level: https://github.com/Level/level     |
 |  =============================================================*/
 
-const level = require('level');
-const chainDB = './chaindata';
-const db = level(chainDB);
+var level   = require('level');
+var sub     = require('level-sublevel');
+var search    = require('level-search');
+var chainDB = './chaindata';
+var db      = sub(level(chainDB, {valueEncoding: 'json'}));
+var index   = search(db, 'search');
 
 // Add data to levelDB with key/value pair
-exports.add = function (key, value){
-  return db.put(key, JSON.stringify(value)).then(() => {
-    return exports.get(key);
+exports.add = function (key, value) {
+  return new Promise(function(resolve, reject) {
+    db.put(key, value, function (err) {
+      if (err) {
+        console.log(err);
+        reject(err);
+      } else {
+        resolve(exports.get(key));
+      }
+    });
   });
 }
 
 // Get data from levelDB with key
 exports.get = function (key){
-  return db.get(key).then(JSON.parse);
+  return new Promise(function(resolve, reject) {
+    db.get(key, function (err, value) {
+      if (err) {
+        console.log(err);
+        reject(err);
+      } else {
+        resolve(value);
+      }
+    });
+  });
 }
 
 exports.getLastKey = function () {
@@ -27,6 +46,29 @@ exports.getLastKey = function () {
     }).on('close', function(){
       resolve(0);
     });
+  });
+}
+
+exports.find = function (keys) {
+  return new Promise(function(resolve, reject) {
+    // ['hash', hash]
+    // ['body', 'address', '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ']
+    const result = [];
+    try {
+      index.createSearchStream(keys).on('data', function(data) {
+        result.push(data.value);
+      }).on('error', function(err){
+        console.log(err);
+        reject(err);
+      }).on('close', function(){
+        resolve(result);
+      }).on('end', function(){
+        resolve(result);
+      });
+    } catch(er) {
+      console.log(er);
+      reject(er);
+    }
   });
 }
 

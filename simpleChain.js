@@ -40,7 +40,7 @@ class Blockchain{
     newBlock.time = new Date().getTime().toString().slice(0,-3);
     newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
     DB.add(newBlock.height, newBlock).then(function(data){
-      console.log(newBlock);
+      console.log(data);
       console.log('Added Genesis Block');
     }).catch(function(err){
       console.log('Error Adding Genesis Block :' + err);
@@ -74,6 +74,10 @@ class Blockchain{
 
   getBlock(height) {
     return DB.get(height);
+  }
+
+  find(keys) {
+    return DB.find(keys);
   }
 
   // validate block
@@ -147,5 +151,7 @@ exports.addBlock = (body) => {
 };
 
 exports.getBlock = myBlockChain.getBlock;
+
+exports.find = myBlockChain.find;
 /*myBlockChain.addBlock(new Block('testing...'));
 myBlockChain.validateChain();*/
