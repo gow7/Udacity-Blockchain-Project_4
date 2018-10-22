@@ -2,10 +2,10 @@
 
 This web service will provide a few new features to your users. The goal is to allow users to notarize star ownership using their blockchain identity. Below are the new features you will build into your application.
 
-1:Notarize	Users will be able to notarize star ownership using their blockchain identity.
-2:Verify Wallet Address	Your application will provide a message to your user allowing them to verify their wallet address with a message signature.
-3:Register a Star	Once a user verifies their wallet address, they have the right to register the star.
-4:Share a Story	Once registered, each star has the ability to share a story.
+1:Notarize	Users will be able to notarize star ownership using their blockchain identity.  
+2:Verify Wallet Address	Your application will provide a message to your user allowing them to verify their wallet address with a message signature.  
+3:Register a Star	Once a user verifies their wallet address, they have the right to register the star.  
+4:Share a Story	Once registered, each star has the ability to share a story.  
 5:Star Lookup	Users will be able to look up their star by hash, block height, or wallet address.
 
 ## Getting Started
