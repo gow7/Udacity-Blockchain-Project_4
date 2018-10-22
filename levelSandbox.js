@@ -2,15 +2,15 @@
 |  Learn more: level: https://github.com/Level/level     |
 |  =============================================================*/
 
-var level   = require('level');
-var sub     = require('level-sublevel');
-var search    = require('level-search');
-var chainDB = './chaindata';
-var db      = sub(level(chainDB, {valueEncoding: 'json'}));
-var index   = search(db, 'search');
+const level   = require('level');
+const sub     = require('level-sublevel');
+const search    = require('level-search');
+const chainDB = './chaindata';
+const db      = sub(level(chainDB, {valueEncoding: 'json'}));
+const index   = search(db, 'search');
 
 // Add data to levelDB with key/value pair
-exports.add = function (key, value) {
+exports.add = (key, value) => {
   return new Promise(function(resolve, reject) {
     db.put(key, value, function (err) {
       if (err) {
@@ -24,7 +24,7 @@ exports.add = function (key, value) {
 }
 
 // Get data from levelDB with key
-exports.get = function (key){
+exports.get = (key) => {
   return new Promise(function(resolve, reject) {
     db.get(key, function (err, value) {
       if (err) {
@@ -37,7 +37,7 @@ exports.get = function (key){
   });
 }
 
-exports.getLastKey = function () {
+exports.getLastKey = () => {
   return new Promise(function(resolve, reject){
     db.createKeyStream({reverse : true, limit : 1}).on('data', function(data){
       resolve(Number(data));
@@ -49,7 +49,7 @@ exports.getLastKey = function () {
   });
 }
 
-exports.find = function (keys) {
+exports.find = (keys) => {
   return new Promise(function(resolve, reject) {
     // ['hash', hash]
     // ['body', 'address', '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ']
@@ -72,7 +72,7 @@ exports.find = function (keys) {
   });
 }
 
-exports.printAll = function () {
+exports.printAll = () => {
   console.log('<--DB Print Start---');
   db.createValueStream().on('data', function(data){
     console.log(data);

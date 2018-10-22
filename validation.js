@@ -4,32 +4,32 @@ const bitcoinMessage = require('bitcoinjs-message');
 const activeAddresses = {};
 const validatedAddresses = {};
 
-const currentTimeStamp = function() {
+const currentTimeStamp = () => {
     return new Date().getTime().toString().slice(0, -3);
 }
 
-const requestTimeStamp = function(address) {
+const requestTimeStamp = (address) => {
     const requestTime = activeAddresses[address];
     return requestTime === undefined ? "time-out" : requestTime;
 }
 
-const message = function(address) {
+const message = (address) => {
     return `${address}:${requestTimeStamp(address)}:starRegistry`;
 }
 
-const validationWindow = function(address) {
+const validationWindow = (address) => {
     let res = 300 - (currentTimeStamp() - activeAddresses[address]);
     return isNaN(res) ? 0 : res;
 }
 
-const response = function(address) {
+const response = (address) => {
     return {address: address,
         requestTimeStamp: requestTimeStamp(address),
         message: message(address),
         validationWindow: validationWindow(address)}
 }
 
-exports.newRequest = function (address) {
+exports.newRequest = (address) => {
     if (activeAddresses[address] === undefined) {
         activeAddresses[address] = currentTimeStamp();
         setTimeout(() => {delete activeAddresses[address]}, 300000);
@@ -37,7 +37,7 @@ exports.newRequest = function (address) {
     return response(address);
 }
 
-exports.sigValidate = function (address, signature) {
+exports.sigValidate = (address, signature) => {
     const mess = message(address);
     const status = response(address);
     status.messageSignature = "not-valid";
@@ -61,7 +61,7 @@ exports.sigValidate = function (address, signature) {
     return res;
 }
 
-exports.registeredStar = function (address) {
+exports.registeredStar = (address) => {
     let res = false;
     if (validatedAddresses[address] !== undefined && validatedAddresses[address]) {
         res = true;

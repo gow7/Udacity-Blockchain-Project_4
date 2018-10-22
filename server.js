@@ -26,7 +26,7 @@ async function find(keys, h) {
         const res = await BC.find(keys);
         res.forEach(element => {
             if (element.body.star.story !== undefined) {
-                element.body.star.story = Buffer.from(element.body.star.story, 'hex').toString('ascii');
+                element.body.star.storyDecoded = Buffer.from(element.body.star.story, 'hex').toString('ascii');
             }
         });
 
@@ -54,8 +54,8 @@ server.route({
         <b>POST</b> /message-signature/validate<br>
         <b>POST</b> /block<br>
         <b>GET</b> /block/[height]<br>
-        <b>GET</b> /block/stars/hash:[hash]<br>
-        <b>GET</b> /block/stars/address:[address]<br>
+        <b>GET</b> /stars/hash:[hash]<br>
+        <b>GET</b> /stars/address:[address]<br>
         `;
     }
 });
@@ -74,7 +74,7 @@ server.route({
         try {
             const res = await BC.getBlock(request.params.height);
             if (res.body.star && res.body.star.story) {
-                res.body.star.story = Buffer.from(res.body.star.story, 'hex').toString('ascii');
+                res.body.star.storyDecoded = Buffer.from(res.body.star.story, 'hex').toString('ascii');
             }
             return res;
         } catch (error) {
@@ -87,7 +87,7 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/block/stars/hash:{hash}',
+    path: '/stars/hash:{hash}',
     options: {
         validate: {
             params: {
@@ -107,7 +107,7 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/block/stars/address:{address}',
+    path: '/stars/address:{address}',
     options: {
         validate: {
             params: {
